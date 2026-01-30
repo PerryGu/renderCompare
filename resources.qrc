@@ -1,0 +1,63 @@
+<RCC>
+    <!-- QML files -->
+    <qresource prefix="/">
+        <file>qml/Main.qml</file>
+        <file>qml/TopLayout_three.qml</file>
+        <file>qml/TopLayout_one.qml</file>
+        <file>qml/ImageItem.qml</file>
+        <file>qml/ReloadedAllImages.qml</file>
+        <file>qml/TimelineChart.qml</file>
+        <file>qml/ImageFileC.qml</file>
+        <file>qml/ImageFileD.qml</file>
+        <file>qml/ImageFileAB.qml</file>
+        <file>qml/TheSwipeView.qml</file>
+        <file>qml/TopLayout_zero.qml</file>
+        <file>qml/InfoHeader.qml</file>
+        <file>qml/MainTableViewHeader.qml</file>
+        <file>qml/CircularProgressbar.qml</file>
+        <file>qml/MultiButton.qml</file>
+        <file>qml/TableviewHandlers.qml</file>
+        <file>qml/TableviewDialogs.qml</file>
+        <file>qml/TableviewTable.qml</file>
+        <file>qml/DoubleBufferedImage.qml</file>
+        <file>qml/utils.js</file>
+        <file>qml/Theme.qml</file>
+        <file>qml/Constants.qml</file>
+        <file>qml/Logger.qml</file>
+        <file>qml/LogWindow.qml</file>
+        <file>qml/MenuBar.qml</file>
+        <file>qml/TooltipManager.qml</file>
+        <file>qml/ErrorDialog.qml</file>
+        <file>qml/PlaybackSpeedMenu.qml</file>
+    </qresource>
+    
+    <!-- Image resources - using /images prefix with aliases to maintain QML compatibility -->
+    <qresource prefix="/images">
+        <file alias="icon_Menu.png">resources/images/icon_Menu.png</file>
+        <file alias="target.png">resources/images/target.png</file>
+        <file alias="playr/fast-forward.png">resources/images/playr/fast-forward.png</file>
+        <file alias="playr/previous.png">resources/images/playr/previous.png</file>
+        <file alias="playr/rewind.png">resources/images/playr/rewind.png</file>
+        <file alias="playr/skip.png">resources/images/playr/skip.png</file>
+        <file alias="progress-background.png">resources/images/progress-background.png</file>
+        <file alias="progress-fill.png">resources/images/progress-fill.png</file>
+        <file alias="slider-handle.png">resources/images/slider-handle.png</file>
+        <file alias="playr/play.png">resources/images/playr/play.png</file>
+        <file alias="playr/play_revers.png">resources/images/playr/play_revers.png</file>
+        <file alias="playr/pageIndicator_left.png">resources/images/playr/pageIndicator_left.png</file>
+        <file alias="playr/pageIndicator_right.png">resources/images/playr/pageIndicator_right.png</file>
+        <file alias="checkmark.png">resources/images/checkmark.png</file>
+        <file alias="exclamation.png">resources/images/exclamation.png</file>
+        <file alias="reload.png">resources/images/reload.png</file>
+        <file alias="log.png">resources/images/log.png</file>
+        <file alias="dropdown.png">resources/images/dropdown.png</file>
+        <file alias="renderCompare.png">resources/images/renderCompare.png</file>
+        <file alias="error.png">resources/images/error.png</file>
+        <file alias="checkmark_proc.png">resources/images/checkmark_proc.png</file>
+        <file alias="error_proc.png">resources/images/error_proc.png</file>
+        <file alias="exclamation_proc.png">resources/images/exclamation_proc.png</file>
+        <file alias="noimage.png">resources/images/noimage.png</file>
+        <file alias="renderComparer_ring.png">resources/images/renderComparer_ring.png</file>
+        <file alias="v2.png">resources/images/v2.png</file>
+    </qresource>
+</RCC>

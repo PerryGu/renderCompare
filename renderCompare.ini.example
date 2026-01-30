@@ -1,0 +1,7 @@
+[freeDView_tester]
+# setTestPath now points to testSets_results (where uiData.xml and all test data is located)
+# The tool will automatically derive testSets folder from this path
+# Replace with your actual path
+setTestPath = /path/to/testSets_results
+freeDViewTesterPath = /path/to/freeDView_tester
+# Note: run_on_test_list is not used in tableview_test.ini - it's only used in freeDView_tester.ini
