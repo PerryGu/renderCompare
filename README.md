@@ -38,7 +38,7 @@ make
 <table>
 <tr>
 <td><img src="media/page2.png" alt="Three-Window View" width="300"/></td>
-<td><img src="media/page2_menu.png" alt="Context Menu" width="300"/></td>
+<td><img src="media/page1_menu.png" alt="Context Menu" width="300"/></td>
 <td><img src="media/page2_slide_menu.png" alt="Slide Menu" width="300"/></td>
 </tr>
 <tr>
