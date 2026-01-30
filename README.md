@@ -786,8 +786,5 @@ Software.
 
 ### Legal Notice
 
-This software was developed during employment at Intel Corporation. 
-Copyright ownership and licensing rights may be subject to Intel's 
-intellectual property policies and employment agreements. Before using, distributing, or licensing this software, all necessary 
-permissions and clearances must be obtained, and compliance with all 
-applicable employment agreements and IP policies must be ensured.
+**Note**: This software was developed during employment at Intel Corporation.
+
