@@ -25,17 +25,12 @@ make
 
 ## Image Gallery
 
-### Table View (Page 0)
 <table>
 <tr>
 <td><img src="media/tableView.png" alt="Table View" width="300"/></td>
 <td><img src="media/progressbars.png" alt="Progress Bars" width="300"/></td>
 <td><img src="media/log_search.png" alt="Log Window and Search" width="300"/></td>
 </tr>
-</table>
-
-### Three-Window Comparison (Page 1)
-<table>
 <tr>
 <td><img src="media/page2.png" alt="Three-Window View" width="300"/></td>
 <td><img src="media/page1_menu.png" alt="Context Menu" width="300"/></td>
@@ -44,12 +39,6 @@ make
 <tr>
 <td><img src="media/page2_time_scale.png" alt="Timeline Chart" width="300"/></td>
 <td><img src="media/page2_zoom.png" alt="Zoom and Pan" width="300"/></td>
-</tr>
-</table>
-
-### Single Window View (Page 2)
-<table>
-<tr>
 <td><img src="media/page3_zoom.png" alt="Single Window with Zoom" width="300"/></td>
 </tr>
 </table>
