@@ -23,6 +23,12 @@ make
 ./renderCompare
 ```
 
+## Video Showcase
+
+[![Render Compare Demo](https://img.youtube.com/vi/RdUw2ZaUavg/0.jpg)](https://youtu.be/RdUw2ZaUavg?si=gkVXnmuXWGJqCwXG)
+
+**Click the thumbnail above to watch the demo video on YouTube.**
+
 ## Image Gallery
 
 <table>
