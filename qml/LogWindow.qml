@@ -22,6 +22,7 @@ Window {
     title: "Log Window"
     color: Theme.backgroundDark
     visible: false
+    flags: Qt.Window | Qt.WindowStaysOnTopHint  // Keep window always on top
     
     // Window properties
     property bool isVisible: false
@@ -50,6 +51,26 @@ Window {
         height: 30
         color: Theme.primaryDark
         z: 10
+        
+        // MouseArea to make title bar draggable (except over close button)
+        MouseArea {
+            id: titleBarMouseArea
+            anchors.fill: parent
+            anchors.rightMargin: closeButton.width  // Exclude close button area
+            property point dragStartPos: Qt.point(0, 0)
+            
+            onPressed: {
+                dragStartPos = Qt.point(mouse.x, mouse.y)
+            }
+            
+            onPositionChanged: {
+                if (pressed) {
+                    var delta = Qt.point(mouse.x - dragStartPos.x, mouse.y - dragStartPos.y)
+                    logWindow.x += delta.x
+                    logWindow.y += delta.y
+                }
+            }
+        }
         
         Text {
             id: titleText
