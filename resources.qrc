@@ -46,18 +46,17 @@
         <file alias="playr/play_revers.png">resources/images/playr/play_revers.png</file>
         <file alias="playr/pageIndicator_left.png">resources/images/playr/pageIndicator_left.png</file>
         <file alias="playr/pageIndicator_right.png">resources/images/playr/pageIndicator_right.png</file>
-        <file alias="checkmark.png">resources/images/checkmark.png</file>
         <file alias="exclamation.png">resources/images/exclamation.png</file>
         <file alias="reload.png">resources/images/reload.png</file>
         <file alias="log.png">resources/images/log.png</file>
         <file alias="dropdown.png">resources/images/dropdown.png</file>
         <file alias="renderCompare.png">resources/images/renderCompare.png</file>
-        <file alias="error.png">resources/images/error.png</file>
-        <file alias="checkmark_proc.png">resources/images/checkmark_proc.png</file>
-        <file alias="error_proc.png">resources/images/error_proc.png</file>
         <file alias="exclamation_proc.png">resources/images/exclamation_proc.png</file>
         <file alias="noimage.png">resources/images/noimage.png</file>
         <file alias="renderComparer_ring.png">resources/images/renderComparer_ring.png</file>
         <file alias="v2.png">resources/images/v2.png</file>
+        <file alias="ready.png">resources/images/ready.png</file>
+        <file alias="rendered_not_compare.png">resources/images/rendered_not_compare.png</file>
+        <file alias="not_ready.png">resources/images/not_ready.png</file>
     </qresource>
 </RCC>
