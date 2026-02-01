@@ -347,8 +347,8 @@ Rectangle {
                 anchors.centerIn: parent
                 source: "/images/log.png"
                 fillMode: Image.PreserveAspectFit
-                width: 25  // Increased by 15% more (22 * 1.15 = 25.3, rounded to 25)
-                height: 25  // Increased by 15% more (22 * 1.15 = 25.3, rounded to 25)
+                width: 38  // Increased by 50% (25 * 1.5 = 37.5, rounded to 38)
+                height: 38  // Increased by 50% (25 * 1.5 = 37.5, rounded to 38)
                 mipmap: true
                 smooth: true
                 // Use Pad mode to avoid black borders on transparent images
