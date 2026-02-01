@@ -1,52 +1,3 @@
-﻿/****************************************************************************
-**
-** Copyright (C) 2016 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
-** as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
 
 /**
  * @file TableviewTable.qml
@@ -118,6 +69,55 @@ Item {
             case 9: return statusColumn.title
             default: return "Unknown Column"
         }
+    }
+    
+    // Helper function to show context menu (for use from Component delegates)
+    function showContextMenu(row, column, globalX, globalY, selectedRowIds, selectedRowCount, columnTitle, hasRenderedNotCompare, hasAnyNotReady, hasNotReadyOrRendered) {
+        // Update context menu text
+        if (selectedRowCount === 1) {
+            contextMenuId.text = "ID: " + (selectedRowIds.length > 0 ? selectedRowIds[0] : "")
+        } else {
+            contextMenuId.text = "Selected: " + selectedRowCount + " row(s)"
+        }
+        contextMenuColumnName.text = "Column: " + columnTitle
+        
+        // Update context menu properties
+        tableViewContainer.contextMenuShowTestRunnerOptions = selectedRowCount > 0
+        
+        if (hasRenderedNotCompare) {
+            tableViewContainer.contextMenuStatus = "Rendered not compare"
+        } else if (hasAnyNotReady) {
+            tableViewContainer.contextMenuStatus = "Not Ready"
+        } else if (hasNotReadyOrRendered) {
+            tableViewContainer.contextMenuStatus = "Not Ready"
+        } else {
+            tableViewContainer.contextMenuStatus = ""
+        }
+        
+        // Position context menu
+        contextMenu.x = globalX + 5
+        contextMenu.y = globalY + 5
+        
+        if (contextMenu.x + contextMenu.width > tableViewContainer.width) {
+            contextMenu.x = tableViewContainer.width - contextMenu.width - 10
+        }
+        if (contextMenu.y + contextMenu.height > tableViewContainer.height) {
+            contextMenu.y = tableViewContainer.height - contextMenu.height - 10
+        }
+        if (contextMenu.x < 0) contextMenu.x = 10
+        if (contextMenu.y < 0) contextMenu.y = 10
+        
+        // Force property updates
+        var dummy1 = tableViewContainer.contextMenuShowTestRunnerOptions
+        var dummy2 = tableViewContainer.contextMenuStatus
+        
+        // Show context menu
+        contextMenu.visible = true
+    }
+    
+    // Helper function to hide context menu (for use from Component delegates)
+    function hideContextMenu() {
+        contextMenu.visible = false
     }
     
     function mapTableViewColumnToModelColumn(tableViewColumnIndex) {
@@ -738,6 +738,185 @@ Item {
             }
         }
 
+        Component {
+            id: statusDelegate
+            Item {
+                // Circular progress bar for status column when row is being processed
+                CircularProgressbar {
+                    id: rowProgressBar
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    visible: {
+                        if (!proxyModel || !xmlDataModel) return false
+                        var sourceRow = proxyModelInstance ? proxyModelInstance.mapProxyRowToSource(styleData.row) : -1
+                        if (sourceRow < 0) return false
+                        var testKey = xmlDataModel.getTestKey(sourceRow) || ""
+                        var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
+                        return normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)
+                    }
+                    isActive: visible
+                    
+                    currentValue: {
+                        if (!proxyModel || !xmlDataModel) return 0
+                        var sourceRow = proxyModelInstance ? proxyModelInstance.mapProxyRowToSource(styleData.row) : -1
+                        if (sourceRow < 0) return 0
+                        var testKey = xmlDataModel.getTestKey(sourceRow) || ""
+                        var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
+                        if (normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)) {
+                            var info = tableViewContainer.rowsInProgress[normalizedTestKey]
+                            if (info && typeof info.progress !== "undefined") {
+                                return info.progress
+                            }
+                        }
+                        return 0
+                    }
+                    
+                    progressText: {
+                        if (!proxyModel || !xmlDataModel) return "Processing"
+                        var sourceRow = proxyModelInstance ? proxyModelInstance.mapProxyRowToSource(styleData.row) : -1
+                        if (sourceRow < 0) return "Processing"
+                        var testKey = xmlDataModel.getTestKey(sourceRow) || ""
+                        var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
+                        if (normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)) {
+                            var info = tableViewContainer.rowsInProgress[normalizedTestKey]
+                            if (info) {
+                                if (info.progress >= 100) {
+                                    return "Finished"
+                                }
+                                if (info.text) {
+                                    return info.text
+                                }
+                            }
+                        }
+                        return "Processing"
+                    }
+                    
+                    textColor: {
+                        if (!proxyModel || !xmlDataModel) return Theme.statusErrorAlt
+                        var sourceRow = proxyModelInstance ? proxyModelInstance.mapProxyRowToSource(styleData.row) : -1
+                        if (sourceRow < 0) return Theme.statusErrorAlt
+                        var testKey = xmlDataModel.getTestKey(sourceRow) || ""
+                        var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
+                        if (normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)) {
+                            var info = tableViewContainer.rowsInProgress[normalizedTestKey]
+                            if (info && (info.progress >= 100 || info.text === "Finish")) {
+                                return Theme.statusSuccessAlt
+                            } else if (info && info.text === "ERROR") {
+                                return Theme.statusErrorAlt
+                            }
+                        }
+                        return Theme.statusErrorAlt
+                    }
+                }
+                
+                // Status icon display (shown when not in progress)
+                Image {
+                    anchors.centerIn: parent
+                    width: Math.min(parent.width - 8, parent.height - 8, 46)  // Reduced by 15% from current (54 * 0.85 = 45.9, rounded to 46)
+                    height: width
+                    fillMode: Image.PreserveAspectFit
+                    visible: !rowProgressBar.visible
+                    source: {
+                        var statusValue = (styleData.value !== undefined ? String(styleData.value) : "")
+                        if (statusValue === "Ready") {
+                            return "/images/ready.png"
+                        } else if (statusValue === "Rendered not compare") {
+                            return "/images/rendered_not_compare.png"
+                        } else if (statusValue === "Not Ready") {
+                            return "/images/not_ready.png"
+                        } else {
+                            return ""
+                        }
+                    }
+                }
+                
+                // MouseArea to handle right-click context menu (same as itemDelegate)
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    hoverEnabled: true
+                    propagateComposedEvents: true
+                    
+                    onPressed: {
+                        // Forward the event to the parent itemDelegate's MouseArea handler
+                        // We need to trigger the same context menu logic
+                        if (mouse.button === Qt.RightButton) {
+                            var row = styleData.row
+                            var column = styleData.column
+                            var globalPos = mapToItem(tableViewContainer, mouse.x, mouse.y)
+                            
+                            // Ensure the hovered row is selected
+                            if (!tableViewContainer.isRowSelected(row)) {
+                                tableViewContainer.addRowToSelection(row)
+                                tableView.selection.select(row)
+                            }
+                            tableView.currentRow = row
+                            
+                            // Store row and column for edit dialog
+                            tableViewContainer.contextMenuRowIndex = row
+                            tableViewContainer.contextMenuColumnIndex = column
+                            
+                            // Check if ANY of the selected rows can run test runner commands
+                            var hasNotReadyOrRendered = false
+                            var hasRenderedNotCompare = false
+                            var hasAnyNotReady = false
+                            var selectedRowIds = []
+                            var rowsToCheck = tableViewContainer.selectedRows.length
+                            
+                            for (var i = 0; i < rowsToCheck; i++) {
+                                var selectedRow = tableViewContainer.selectedRows[i]
+                                if (selectedRow >= 0 && selectedRow !== undefined && proxyModel) {
+                                    var rowData = proxyModelInstance.get(selectedRow)
+                                    if (rowData) {
+                                        var rowId = rowData.id || ""
+                                        var status = rowData.status || ""
+                                        selectedRowIds.push(rowId)
+                                        
+                                        if (status === "Not Ready" || status === "Rendered not compare") {
+                                            hasNotReadyOrRendered = true
+                                        }
+                                        if (status === "Not Ready") {
+                                            hasAnyNotReady = true
+                                        }
+                                        if (status === "Rendered not compare") {
+                                            hasRenderedNotCompare = true
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            var selectedRowCount = tableViewContainer.selectedRows.length
+                            // Get column title - need to access through tableViewContainer's function
+                            var columnTitle = ""
+                            switch(column) {
+                                case 0: columnTitle = idColumn.title; break
+                                case 1: columnTitle = thumbnailColumn.title; break
+                                case 2: columnTitle = eventNameColumn.title; break
+                                case 3: columnTitle = sportTypeColumn.title; break
+                                case 4: columnTitle = stadiumColumn.title; break
+                                case 5: columnTitle = categoryColumn.title; break
+                                case 6: columnTitle = framesColumn.title; break
+                                case 7: columnTitle = minValColumn.title; break
+                                case 8: columnTitle = notesColumn.title; break
+                                case 9: columnTitle = statusColumn.title; break
+                                default: columnTitle = "Unknown Column"; break
+                            }
+                            
+                            // Store row and column for edit dialog
+                            tableViewContainer.contextMenuRowIndex = row
+                            tableViewContainer.contextMenuColumnIndex = column
+                            
+                            // Use helper function to show context menu (Components can't access parent scope directly)
+                            tableContainer.showContextMenu(row, column, globalPos.x, globalPos.y, selectedRowIds, selectedRowCount, columnTitle, hasRenderedNotCompare, hasAnyNotReady, hasNotReadyOrRendered)
+                        } else {
+                            // Left-click - hide context menu
+                            tableContainer.hideContextMenu()
+                        }
+                    }
+                }
+            }
+        }
+
         headerDelegate: Rectangle {
             id: headerRect
             height: 50  // Increased height for more prominent header
@@ -894,6 +1073,7 @@ Item {
             movable: false
             resizable: true
             width: xmlDataModel && tableView ? tableView.viewport.width * xmlDataModel.getColumnWidthRatio(9) : 80
+            delegate: statusDelegate
         }
 
         rowDelegate: Rectangle {
@@ -924,117 +1104,14 @@ Item {
         }
 
         itemDelegate: Item {
-            id: itemDelegateItem
-            
-            // Check if this is the status column (column 9) and if this row is being processed
-            readonly property bool isStatusColumn: styleData.column === 9
-            // Check if this row is in progress (computed inline for reactivity)
-            // Note: Computing inline causes a small delay but ensures correct reactivity
-            readonly property bool isRowInProgress: {
-                if (!isStatusColumn) return false
-                // Compute testKey inline to ensure reactivity to styleData.row changes
-                var sourceRow = proxyModelInstance ? proxyModelInstance.mapProxyRowToSource(styleData.row) : -1
-                if (sourceRow < 0 || !xmlDataModel) return false
-                var testKey = xmlDataModel.getTestKey(sourceRow) || ""
-                var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
-                return normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)
-            }
-            
-            // Circular progress bar for status column when row is being processed
-            CircularProgressbar {
-                id: rowProgressBar
-                anchors.fill: parent
-                anchors.margins: 2
-                visible: isRowInProgress
-                isActive: isRowInProgress
-                
-                // Bind directly to tableViewContainer.rowsInProgress[testKey] properties with fallbacks (keyed by testKey, not row index)
-                // Compute testKey inline in binding to ensure reactivity to styleData.row changes
-                // Note: This causes a small delay but ensures correct functionality
-                currentValue: {
-                    if (!itemDelegateItem.isStatusColumn || !proxyModel || !xmlDataModel) return 0
-                    var sourceRow = proxyModelInstance.mapProxyRowToSource(styleData.row)
-                    if (sourceRow < 0) return 0
-                    var testKey = xmlDataModel.getTestKey(sourceRow) || ""
-                    var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
-                    if (normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)) {
-                        var info = tableViewContainer.rowsInProgress[normalizedTestKey]
-                        if (info && typeof info.progress !== "undefined") {
-                            return info.progress
-                        }
-                    }
-                    return 0
-                }
-                // progressText binding - primary mechanism for text updates
-                // This will automatically update when tableViewContainer.rowsInProgress changes
-                progressText: {
-                    if (!itemDelegateItem.isStatusColumn || !proxyModel || !xmlDataModel) return "Processing"
-                    var sourceRow = proxyModelInstance.mapProxyRowToSource(styleData.row)
-                    if (sourceRow < 0) return "Processing"
-                    var testKey = xmlDataModel.getTestKey(sourceRow) || ""
-                    var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
-                    if (normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)) {
-                        var info = tableViewContainer.rowsInProgress[normalizedTestKey]
-                        if (info) {
-                            // Always check progress first - if >= 100, show "Finished"
-                            if (info.progress >= 100) {
-                                return "Finished"
-                            }
-                            // Otherwise use the text from info
-                            if (info.text) {
-                                return info.text
-                            }
-                        }
-                    }
-                    return "Processing"
-                }
-                // Ensure textColor is never undefined (use default or computed based on state)
-                textColor: {
-                    if (!itemDelegateItem.isStatusColumn || !proxyModel || !xmlDataModel) return Theme.statusErrorAlt
-                    var sourceRow = proxyModelInstance.mapProxyRowToSource(styleData.row)
-                    if (sourceRow < 0) return Theme.statusErrorAlt
-                    var testKey = xmlDataModel.getTestKey(sourceRow) || ""
-                    var normalizedTestKey = testKey.replace(/\\/g, "/").replace(/\/+$/, "")
-                    if (normalizedTestKey !== "" && tableViewContainer.rowsInProgress && tableViewContainer.rowsInProgress.hasOwnProperty(normalizedTestKey)) {
-                        var info = tableViewContainer.rowsInProgress[normalizedTestKey]
-                        // Check if finished (progress >= 100 or text is "Finish")
-                        if (info && (info.progress >= 100 || info.text === "Finish")) {
-                            return Theme.statusSuccessAlt  // Green for finished
-                        } else if (info && info.text === "ERROR") {
-                            return Theme.statusErrorAlt  // Red for error
-                        }
-                    }
-                    return Theme.statusErrorAlt  // Default in-progress color
-                }
-                
-                // Note: rowsInProgress is a property, not a signal. The progressText binding above will automatically update when rowsInProgress changes.
-            }
-            
-            // Regular text display (shown when not in progress or not status column)
+            // Regular text display for all columns except status (which has its own delegate)
             Text {
                 anchors.fill: parent
                 anchors.margins: 4
                 text: styleData.value !== undefined ? styleData.value : ""
-                // Color logic: Selection orange takes precedence, then Status column colors (green for "Ready", red for others), then default black
-                color: {
-                    if (styleData.selected) {
-                        return Theme.primaryAccent  // Green for selected rows (same as navigation buttons)
-                    } else if (isStatusColumn) {
-                        // Status column: green for "Ready", red for any other status
-                        var statusValue = (styleData.value !== undefined ? String(styleData.value) : "")
-                        if (statusValue === "Ready") {
-                            return Theme.statusSuccessAlt  // Green for "Ready"
-                        } else {
-                            return Theme.statusErrorAlt  // Red for other statuses
-                        }
-                    } else {
-                        return "black"  // Default for other columns
-                    }
-                }
+                color: styleData.selected ? Theme.primaryAccent : "black"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                // Hide text in status column when progress bar is showing
-                visible: !isRowInProgress
             }
             
             // MouseArea handles row selection and click events
