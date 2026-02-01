@@ -580,6 +580,97 @@ testSets_results/
 
 **Note**: All paths in XML files are stored as relative paths (relative to `testSets_results` root) for cross-platform compatibility and data portability.
 
+### XML File Format Examples
+
+#### uiData.xml
+
+The main data file that contains aggregated information about all test events. Located in the `testSets_results` root directory.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<uiData>
+    <renderVersions>
+        <version>freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8</version>
+        <version>freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.9</version>
+    </renderVersions>
+    <entries>
+        <entry>
+            <id>001</id>
+            <eventName>E15_08_10_19_51_35_LIVE_10</eventName>
+            <sportType>MLB</sportType>
+            <stadiumName>Dodgers</stadiumName>
+            <categoryName>Regular</categoryName>
+            <numberOfFrames>62</numberOfFrames>
+            <minValue>0.9279</minValue>
+            <numFramesUnderMin>5</numFramesUnderMin>
+            <thumbnailPath>MLB\Dodgers\E15_08_10_19_51_35_LIVE_10\S170123190428\F0001\freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8\results\diff_images\F0001.png</thumbnailPath>
+            <status>Ready</status>
+            <notes></notes>
+            <renderVersions>freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8</renderVersions>
+        </entry>
+        <entry>
+            <id>002</id>
+            <eventName>E16_05_11_20_56_48_LIVE_22</eventName>
+            <sportType>NBA</sportType>
+            <stadiumName>NCAA Final Four 2017</stadiumName>
+            <categoryName>Playoff</categoryName>
+            <numberOfFrames>211</numberOfFrames>
+            <minValue>0.5492</minValue>
+            <numFramesUnderMin>107</numFramesUnderMin>
+            <thumbnailPath>NBA\NCAA Final Four 2017\E16_05_11_20_56_48_LIVE_22\S170123190428\F0001\freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8\results\diff_images\F0001.png</thumbnailPath>
+            <status>Ready</status>
+            <notes>Test notes here</notes>
+            <renderVersions>freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8</renderVersions>
+        </entry>
+    </entries>
+</uiData>
+```
+
+#### compareResult.xml
+
+Individual comparison data file for each test event. Located in `results/` subdirectory of each test set.
+
+```xml
+<?xml version="1.0"?>
+<root>
+    <sourcePath>MLB\Dodgers\E15_08_10_19_51_35_LIVE_10\S170123190428\F0001\freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8\freedview_1.2.1.6_1.0.0.5</sourcePath>
+    <testPath>MLB\Dodgers\E15_08_10_19_51_35_LIVE_10\S170123190428\F0001\freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8\freedview_1.2.1.6_1.0.0.8</testPath>
+    <diffPath>MLB\Dodgers\E15_08_10_19_51_35_LIVE_10\S170123190428\F0001\freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8\results\diff_images</diffPath>
+    <alphaPath>MLB\Dodgers\E15_08_10_19_51_35_LIVE_10\S170123190428\F0001\freedview_1.2.1.6_1.0.0.5_VS_freedview_1.2.1.6_1.0.0.8\results\alpha_images</alphaPath>
+    <origFreeDView>freedview_1.2.1.6_1.0.0.5</origFreeDView>
+    <testFreeDView>freedview_1.2.1.6_1.0.0.8</testFreeDView>
+    <eventName>E15_08_10_19_51_35_LIVE_10</eventName>
+    <sportType>MLB</sportType>
+    <stadiumName>Dodgers</stadiumName>
+    <categoryName></categoryName>
+    <startFrame>0</startFrame>
+    <endFrame>61</endFrame>
+    <minVal>0.9279</minVal>
+    <maxVal>1.0000</maxVal>
+    <frames>
+        <frame>
+            <frameIndex>0</frameIndex>
+            <value>0.9876</value>
+        </frame>
+        <frame>
+            <frameIndex>1</frameIndex>
+            <value>0.9543</value>
+        </frame>
+        <frame>
+            <frameIndex>2</frameIndex>
+            <value>0.9279</value>
+        </frame>
+    </frames>
+</root>
+```
+
+**Key Points:**
+- All paths in XML files are **relative** to `testSets_results` root directory
+- `uiData.xml` contains aggregated data for the table view
+- `compareResult.xml` contains frame-by-frame comparison data for the timeline chart
+- Frame indices in `compareResult.xml` are typically 0-indexed
+- Status values: `"Ready"`, `"Rendered not compare"`, `"Not Ready"`
+
 ------------------------------------------------------------------------
 
 ## Performance
