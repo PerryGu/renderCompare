@@ -713,9 +713,12 @@ Rectangle {
         updateValueWhileDragging :true
         tickmarksEnabled: true
         stepSize:1
-        width: parent.width - Constants.timelineSliderWidthOffset
-        x: Constants.timelineSliderX
-        y:45
+        anchors.left: parent.left
+        anchors.leftMargin: Constants.timelineSliderX
+        anchors.right: parent.right
+        anchors.rightMargin: Constants.timelineSliderWidthOffset - Constants.timelineSliderX
+        anchors.top: parent.top
+        anchors.topMargin: 45
         z:1
         value: startFrame
         opacity: 0.95
@@ -1187,12 +1190,48 @@ Rectangle {
         z:3
         color: Theme.chartMark
         radius: 14
+        
+        // Destroy zoom selector when orange bar resizes (separator moved)
+        onWidthChanged: {
+            if (selection) {
+                destroyTimeSliderZoomSelComponent()
+            }
+        }
+        onHeightChanged: {
+            if (selection) {
+                destroyTimeSliderZoomSelComponent()
+            }
+        }
+        onXChanged: {
+            if (selection) {
+                destroyTimeSliderZoomSelComponent()
+            }
+        }
+        onYChanged: {
+            if (selection) {
+                destroyTimeSliderZoomSelComponent()
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                if(!selection)
-                    selection = timeSliderZoomSelComponent_id.createObject(parent, {"x": parent.x-30, "y": parent.y -264, "width": parent.width-20, "height": parent.height-2 })
+                // Always destroy existing selection first to ensure clean state
+                if(selection) {
+                    destroyTimeSliderZoomSelComponent()
+                }
+                
+                // Calculate relative positions for the zoom selector
+                // The selector should sit inside the orange bar (as a child of the orange bar)
+                var selX = 10  // Small margin from left edge of orange bar
+                var selY = 1  // Small margin from top of orange bar (positioned inside)
+                var selWidth = parent.width - 20  // Width with margins on both sides
+                var selHeight = parent.height - 2  // Height slightly less than orange bar to fit inside
+                
+                selection = timeSliderZoomSelComponent_id.createObject(parent, {"x": selX, "y": selY, "width": selWidth, "height": selHeight })
+                if (!selection) {
+                    Logger.error("[UI] Failed to create zoom selector")
+                }
             }
         }
         
@@ -1265,11 +1304,13 @@ Rectangle {
                     drag{ target: parent; axis: Drag.XAxis }
                     onMouseXChanged: {
                         if(drag.active){
+                            Logger.debug("[UI] Start handle dragging - mouseX=" + mouseX + ", current x=" + selComp_id.x + ", width=" + selComp_id.width)
                             timeSliderStart(selComp_id.x)
                             selComp_id.width = selComp_id.width - mouseX
                             selComp_id.x = selComp_id.x + mouseX
                             if(selComp_id.width < 30)
                                 selComp_id.width = 30
+                            Logger.debug("[UI] Start handle dragged - new x=" + selComp_id.x + ", new width=" + selComp_id.width)
                         }
                     }
                 }
@@ -1289,10 +1330,12 @@ Rectangle {
                     drag{ target: parent; axis: Drag.XAxis }
                     onMouseXChanged: {
                         if(drag.active){
+                            Logger.debug("[UI] End handle dragging - mouseX=" + mouseX + ", current x=" + selComp_id.x + ", width=" + selComp_id.width)
                             timeSliderEnd(selComp_id.width+selComp_id.x)
                             selComp_id.width = selComp_id.width + mouseX
                             if(selComp_id.width < 50)
                                 selComp_id.width = 50
+                            Logger.debug("[UI] End handle dragged - new x=" + selComp_id.x + ", new width=" + selComp_id.width)
                         }
                     }
                 }
@@ -1473,6 +1516,4 @@ Rectangle {
         }
         setSliderVal(getLowVal_list[getLowVal_list.length-1])
     }
-
-
 }
