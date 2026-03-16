@@ -297,48 +297,58 @@ Load newly visible version if not already loaded (lazy loading)
 
 # Architecture Diagram
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Main.qml (Root)                          │
-│  ┌──────────────────────┐  ┌──────────────────────────────┐ │
-│  │   TableView          │  │   TheSwipeView               │ │
-│  │   (Page 0)           │  │   (Navigation)               │ │
-│  │                      │  │                              │ │
-│  │  ┌────────────────┐  │  │  ┌────────────────────────┐  │ │
-│  │  │ MainTableView  │  │  │  │ TopLayout_three        │  │ │
-│  │  │ Header         │  │  │  │ (Page 1: 3-Window)     │  │ │
-│  │  └────────────────┘  │  │  │  ┌──────┐ ┌──────┐     │  │ │
-│  │                      │  │  │  │ImageA│ │ImageB│     │  │ │
-│  │  ┌────────────────┐  │  │  │  └──────┘ └──────┘     │  │ │
-│  │  │ TableviewTable │  │  │  │  ┌──────┐              │  │ │
-│  │  │                │  │  │  │  │ImageC│              │  │ │
-│  │  │ - Sortable     │  │  │  │  └──────┘              │  │ │
-│  │  │ - Filterable   │  │  │  └────────────────────────┘  │ │
-│  │  │ - Searchable   │  │  │  ┌────────────────────────┐  │ │
-│  │  └────────────────┘  │  │  │ TopLayout_one          │  │ │
-│  │                      │  │  │ (Page 2: Single Window)│  │ │
-│  │  ┌────────────────┐  │  │  │  ┌──────────────────┐  │  │ │
-│  │  │ Tableview      │  │  │  │  │ ImageItem (D)    │  │  │ │
-│  │  │ Handlers       │  │  │  │  │ + A/B Toggle     │  │  │ │
-│  │  └────────────────┘  │  │  │  └──────────────────┘  │  │ │
-│  └──────────────────────┘  │  └────────────────────────┘  │ │
-│                            │  ┌────────────────────────┐  │ │
-│                            │  │ TimelineChart          │  │ │
-│                            │  │ (Shared)               │  │ │
-│                            │  └────────────────────────┘  │ │
-│                            └──────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-┌───────▼────────┐  ┌─────────▼────────┐  ┌─────────▼────────┐
-│ XmlDataModel   │  │ ImageLoader      │  │ TesterRunner     │
-│ (C++ Backend)  │  │ Manager          │  │ (C++ Backend)    │
-│                │  │ (C++ Backend)    │  │                  │
-│ - XML Parsing  │  │ - Path Resolution│  │ - QProcess       │
-│ - Data Model   │  │ - LRU Cache      │  │ - Progress Track │
-│ - Threading    │  │ - Thread Pool    │  │ - Error Handle   │
-└────────────────┘  └──────────────────┘  └──────────────────┘
+```mermaid
+flowchart TD
+    MAIN{"Main.qml (Root)"}
+
+    %% Splitting to force horizontal side-by-side layout
+    MAIN === TABLE
+    MAIN === SWIPE
+
+    subgraph TABLE ["TableView (Page 0)"]
+        THEAD["MainTableView Header"]
+        TTAB["TableviewTable<br/>- Sortable<br/>- Filterable<br/>- Searchable"]
+        THAND["Tableview Handlers"]
+        
+        THEAD ~~~ TTAB ~~~ THAND
+    end
+
+    subgraph SWIPE ["TheSwipeView (Navigation)"]
+        TOP3["TopLayout_three (Page 1)<br/>[ ImageA | ImageB | ImageC ]"]
+        TOP1["TopLayout_one (Page 2)<br/>[ ImageItem (D) + A/B Toggle ]"]
+        CHART["TimelineChart<br/>(Shared)"]
+        
+        TOP3 ~~~ TOP1 ~~~ CHART
+    end
+
+    %% C++ Backend Nodes
+    XML["XmlDataModel (C++ Backend)<br/>- XML Parsing<br/>- Data Model<br/>- Threading"]
+    LOADER["ImageLoader Manager (C++ Backend)<br/>- Path Resolution<br/>- LRU Cache<br/>- Thread Pool"]
+    RUNNER["TesterRunner (C++ Backend)<br/>- QProcess<br/>- Progress Track<br/>- Error Handle"]
+
+    %% Connecting Frontend to Backend
+    TABLE ==> XML
+    TABLE ==> LOADER
+    SWIPE ==> LOADER
+    SWIPE ==> RUNNER
+
+    %% Styling
+    style MAIN fill:#2D3748,stroke:#63B3ED,stroke-width:2px,color:#FFFFFF
+    
+    style TABLE fill:none,stroke:#68D391,stroke-width:2px,color:#E2E8F0
+    style SWIPE fill:none,stroke:#68D391,stroke-width:2px,color:#E2E8F0
+    
+    style THEAD fill:#253237,stroke:#63B3ED,color:#E2E8F0
+    style TTAB fill:#253237,stroke:#63B3ED,color:#E2E8F0
+    style THAND fill:#253237,stroke:#63B3ED,color:#E2E8F0
+    
+    style TOP3 fill:#253237,stroke:#63B3ED,color:#E2E8F0
+    style TOP1 fill:#253237,stroke:#63B3ED,color:#E2E8F0
+    style CHART fill:#253237,stroke:#63B3ED,color:#E2E8F0
+    
+    style XML fill:#2D3748,stroke:#F6AD55,stroke-width:2px,color:#FFFFFF
+    style LOADER fill:#2D3748,stroke:#F6AD55,stroke-width:2px,color:#FFFFFF
+    style RUNNER fill:#2D3748,stroke:#F6AD55,stroke-width:2px,color:#FFFFFF
 ```
 
 ------------------------------------------------------------------------
