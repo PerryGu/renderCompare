@@ -862,7 +862,7 @@ Features comprehensive error handling, logging, and performance optimizations.
 
 ## Contact & Author
 
-**Perry Guy** - Technical Artist & CG Engineer  
+**Perry Guy** 
 *Extensive experience in 3D Graphics, Tool Development, and Performance Optimization.*
 
 📧 **Email**: [perryguy2@gmail.com](mailto:perryguy2@gmail.com)
